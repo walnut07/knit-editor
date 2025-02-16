@@ -40,6 +40,5 @@ void disableRawMode() {
 
 int main() {
     enableRawMode();
-    printf("Raw mode enabled. Type something (CTRL+C to exit).\n");
     return 0;
 }
