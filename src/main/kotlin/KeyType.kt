@@ -1,3 +1,5 @@
+import models.CursorColumn
+import models.CursorRow
 import org.jline.utils.NonBlockingReader
 
 sealed class KeyType {
@@ -47,19 +49,20 @@ sealed class KeyType {
 }
 
 enum class ArrowDirection(
-    val deltaCol: Int,
-    val deltaRow: Int,
+    val deltaCol: CursorColumn,
+    val deltaRow: CursorRow,
 ) {
-    UP(0, -1),
-    DOWN(0, 1),
-    LEFT(-1, 0),
-    RIGHT(1, 0),
+    UP(CursorColumn(0), CursorRow(-1)),
+    DOWN(CursorColumn(0), CursorRow(1)),
+    LEFT(CursorColumn(-1), CursorRow(0)),
+    RIGHT(CursorColumn(1), CursorRow(0)),
 }
 
 enum class ControlCharacterKind {
     LineFeed, // \n
     CarriageReturn, // \r
     Backspace, // \b
+    Quit, // q
 }
 
 private fun getControlCharacterKind(input: Int): ControlCharacterKind? =
@@ -67,5 +70,6 @@ private fun getControlCharacterKind(input: Int): ControlCharacterKind? =
         '\n'.code -> ControlCharacterKind.LineFeed
         '\r'.code -> ControlCharacterKind.CarriageReturn
         '\b'.code -> ControlCharacterKind.Backspace
+        'C'.code -> ControlCharacterKind.Quit
         else -> null
     }

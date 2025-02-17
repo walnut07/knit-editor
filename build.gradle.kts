@@ -38,6 +38,8 @@ tasks.withType<JavaExec> {
     standardInput = System.`in`
 }
 
+// TODO: Create a task to compile the C program "raw_mode.c".
+
 kotlin {
     jvmToolchain(17)
 }

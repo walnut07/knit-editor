@@ -1,5 +1,3 @@
-import models.CursorColumn
-import models.CursorRow
 import models.Line
 import org.jline.terminal.Terminal
 import org.jline.terminal.TerminalBuilder
@@ -14,36 +12,48 @@ fun main() {
     val writer = KnitPrintWriter(terminal.writer())
     val reader = terminal.reader()
 
-    // Initialize nodes.
-    writer.lineHead = Line(arrayListOf(), prev = null, next = null)
+    // Prepare doubly-linked list.
+    writer.lineHead = Line(arrayListOf(), prev = null, next = null) // head node
     writer.currentLine = writer.lineHead
+    writer.totalLines = 1
 
     // Ensure the cursor position is set at the top left.
-    assertEquals(0, writer.cursorRow.value)
-    assertEquals(0, writer.cursorColumn.value)
+    assertEquals(1, writer.cursorRow.value)
+    assertEquals(1, writer.cursorColumn.value)
 
     // Start reading user's input.
     while (true) {
         val key = reader.read()
+        if (key == 'q'.code) break // Temporarily set
+
         val keyType: KeyType = KeyType.Utils.parse(reader, key)
 
         when (keyType) {
             is KeyType.Arrow -> {
-                writer.moveCursor(
-                    deltaCol = CursorColumn(keyType.direction.deltaCol),
-                    deltaRow = CursorRow(keyType.direction.deltaRow),
-                )
+                // TODO: Encapsulate these operations in [KnitPrintWriter].
+                if (writer.validateCursorPosition(
+                        rowDelta = keyType.direction.deltaRow.value,
+                        columnDelta = keyType.direction.deltaCol.value,
+                    )
+                ) {
+                    writer.cursorRow += keyType.direction.deltaRow
+                    writer.cursorColumn += keyType.direction.deltaCol
+                    writer.renderCursor()
+                }
             }
             is KeyType.ControlCharacter -> {
+                // TODO: Handle more control characters like ^C.
                 writer.command(keyType.controlCharacterKind)
             }
             is KeyType.Text -> writer.insert(keyType.value)
-            is KeyType.Unknown -> continue
+            is KeyType.Unknown -> {
+                writer.println("Unknown key type $keyType")
+                writer.flush()
+            }
         }
-        // TODO: Handle control character like ^C.
     }
 
-    writer.println("\nFinal document structure:\n${writer.lineHead}")
+    writer.println("\r\nFinal document structure:\n${writer.lineHead}")
     writer.flush()
 
     terminal.close()

@@ -4,11 +4,11 @@ import org.jline.terminal.Terminal
 // Welcome to Kurumi's editor!
 // ----------------------
 fun Terminal.renderTopBar() {
-    val writer = this.writer()
-    writer.print("\u001b[2J") // Clears the terminal
-    writer.print("\u001b[0;0H") // Moves cursor to top left
-    writer.println("Welcome to Kurumi's editor!")
-    writer.println("----------------------")
-    writer.print("\r")
-    writer.flush()
+    with(this.writer()) {
+        print("\u001b[2J") // Clear screen
+        print("\u001b[0;0H") // Move cursor to top left
+        print("Welcome to Kurumi's editor!\r\n")
+        print("----------------------\r\n")
+        flush()
+    }
 }

@@ -1,5 +1,9 @@
 package models
 
+// TODO: Needs refactoring.
+// Make an abstract class or interface that the two classes will inherit.
+// Remove JvmInline from the two classes, so it's value will be mutable.
+
 /**
  * Cursor's vertical position in the terminal.
  * CursorRow = 0 means the cursor is at the topmost row.
