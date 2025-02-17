@@ -18,8 +18,8 @@ fun main() {
     writer.totalLines = 1
 
     // Ensure the cursor position is set at the top left.
-    assertEquals(1, writer.cursorRow.value)
-    assertEquals(1, writer.cursorColumn.value)
+    assertEquals(1, writer.cursorRow.toInt())
+    assertEquals(1, writer.cursorColumn.toInt())
 
     // Start reading user's input.
     while (true) {
@@ -30,16 +30,7 @@ fun main() {
 
         when (keyType) {
             is KeyType.Arrow -> {
-                // TODO: Encapsulate these operations in [KnitPrintWriter].
-                if (writer.validateCursorPosition(
-                        rowDelta = keyType.direction.deltaRow.value,
-                        columnDelta = keyType.direction.deltaCol.value,
-                    )
-                ) {
-                    writer.cursorRow += keyType.direction.deltaRow
-                    writer.cursorColumn += keyType.direction.deltaCol
-                    writer.renderCursor()
-                }
+                writer.arrow(keyType.direction)
             }
             is KeyType.ControlCharacter -> {
                 // TODO: Handle more control characters like ^C.

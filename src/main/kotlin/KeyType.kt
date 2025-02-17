@@ -1,8 +1,12 @@
-import models.CursorColumn
-import models.CursorRow
 import org.jline.utils.NonBlockingReader
 
-sealed class KeyType {
+/**
+ * Contains key types that knit supports.
+ */
+internal sealed class KeyType {
+    /**
+     * Represents an arrow key such as ↑, →, ↓, ←.
+     */
     class Arrow(
         val direction: ArrowDirection,
     ) : KeyType()
@@ -11,6 +15,9 @@ sealed class KeyType {
         val controlCharacterKind: ControlCharacterKind,
     ) : KeyType()
 
+    /**
+     * A character that user intended to write.
+     */
     class Text(
         val value: Char,
     ) : KeyType()
@@ -22,46 +29,47 @@ sealed class KeyType {
             reader: NonBlockingReader,
             key: Int,
         ): KeyType {
-            val a =
-                when (key) {
-                    27 -> { // Arrow key
-                        val next = reader.read()
-                        if (next == 91) { // '[' in ANSI escape sequence
-                            when (reader.read()) {
-                                65 -> Arrow(ArrowDirection.UP)
-                                66 -> Arrow(ArrowDirection.DOWN)
-                                67 -> Arrow(ArrowDirection.RIGHT)
-                                68 -> Arrow(ArrowDirection.LEFT)
-                                else -> Unknown
-                            }
-                        } else {
-                            Unknown
+            val a
+            when (key) {
+                27 -> { // Arrow key
+                    val next = reader.read()
+                    if (next == 91) { // '[' in ANSI escape sequence
+                        when (reader.read()) {
+                            65 -> Arrow(ArrowDirection.UP)
+                            66 -> Arrow(ArrowDirection.DOWN)
+                            67 -> Arrow(ArrowDirection.RIGHT)
+                            68 -> Arrow(ArrowDirection.LEFT)
+                            else -> Unknown
                         }
+                    } else {
+                        Unknown
                     }
-                    // Control character
-                    '\n'.code, '\r'.code, '\b'.code -> getControlCharacterKind(key)?.let { ControlCharacter(it) } ?: Unknown
-                    // Normal key
-                    else -> Text(key.toChar())
                 }
+                // Control character
+                '\n'.code, '\r'.code, '\b'.code, 127 -> getControlCharacterKind(key)?.let { ControlCharacter(it) } ?: Unknown
+                // Normal key
+                else -> Text(key.toChar())
+            }
             return a
         }
     }
 }
 
 enum class ArrowDirection(
-    val deltaCol: CursorColumn,
-    val deltaRow: CursorRow,
+    val deltaCol: Int,
+    val deltaRow: Int,
 ) {
-    UP(CursorColumn(0), CursorRow(-1)),
-    DOWN(CursorColumn(0), CursorRow(1)),
-    LEFT(CursorColumn(-1), CursorRow(0)),
-    RIGHT(CursorColumn(1), CursorRow(0)),
+    UP(deltaCol = 0, deltaRow = -1),
+    DOWN(deltaCol = 0, deltaRow = 1),
+    LEFT(deltaCol = -1, deltaRow = 0),
+    RIGHT(deltaCol = 1, deltaRow = 0),
 }
 
 enum class ControlCharacterKind {
     LineFeed, // \n
     CarriageReturn, // \r
     Backspace, // \b
+    Delete, // ASCII 127
     Quit, // q
 }
 
@@ -70,6 +78,7 @@ private fun getControlCharacterKind(input: Int): ControlCharacterKind? =
         '\n'.code -> ControlCharacterKind.LineFeed
         '\r'.code -> ControlCharacterKind.CarriageReturn
         '\b'.code -> ControlCharacterKind.Backspace
+        127 -> ControlCharacterKind.Delete
         'C'.code -> ControlCharacterKind.Quit
         else -> null
     }

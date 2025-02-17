@@ -5,12 +5,15 @@ import java.io.PrintWriter
 import kotlin.properties.Delegates
 
 /**
- * Custom PrintWriter with additional cursor and command handling.
+ * The knit's custom PrintWriter with additional cursor and command handling.
  */
 class KnitPrintWriter(
     out: PrintWriter,
 ) : PrintWriter(out) {
-    val ROWS = 2
+    companion object {
+        /** The number of rows at the top bar */
+        const val TOP_ROWS = 2
+    }
 
     /** The topmost line in text buffer. Always points to the head of linked list.*/
     lateinit var lineHead: Line
@@ -23,15 +26,30 @@ class KnitPrintWriter(
 
     // Cursor's position in the terminal.
     // Initially it is placed at the top left.
-    var cursorColumn: CursorColumn = CursorColumn(1)
-    var cursorRow: CursorRow = CursorRow(1)
+    var cursorColumn: CursorColumn = CursorColumn()
+    var cursorRow: CursorRow = CursorRow()
+
+    /**
+     * Processes an arrow key.
+     */
+    internal fun arrow(direction: ArrowDirection) {
+        if (validateCursorPosition(
+                rowDelta = direction.deltaRow,
+                columnDelta = direction.deltaCol,
+            )
+        ) {
+            cursorRow += direction.deltaRow
+            cursorColumn += direction.deltaCol
+            renderCursor()
+        }
+    }
 
     /**
      * Processes a control character such as `\n`.
-     * It may update [currentLine] and other properties based on the operation.
+     * It may update [currentLine] and other properties.
      */
-    internal fun command(keyType: ControlCharacterKind) {
-        when (keyType) {
+    internal fun command(input: ControlCharacterKind) {
+        when (input) {
             ControlCharacterKind.LineFeed, ControlCharacterKind.CarriageReturn -> {
                 // Create a new line.
                 val newLine = Line(arrayListOf(), prev = currentLine, next = null)
@@ -39,14 +57,15 @@ class KnitPrintWriter(
                 currentLine = newLine
 
                 cursorRow++
-                cursorColumn = CursorColumn(1) // TODO: Define a reset method in CursorColumn
+                cursorColumn.reset()
                 totalLines++
                 refreshScreenFully()
             }
-            ControlCharacterKind.Backspace -> {
-                if (cursorColumn - 1 >= 1) {
+            ControlCharacterKind.Backspace, ControlCharacterKind.Delete -> {
+                // Delete the current character.
+                if (cursorColumn.toInt() - 1 >= 1) {
                     // Move cursor left by one column.
-                    currentLine.text.removeAt(cursorColumn.value - 1)
+                    currentLine.text.removeAt(cursorColumn.toInt() - 2)
                     cursorColumn -= 1
                     refreshScreenFully()
                 }
@@ -69,7 +88,7 @@ class KnitPrintWriter(
             currentLine.text.add(char)
             cursorColumn += 1
         } else {
-            currentLine.text.add(cursorColumn.value - 1, char)
+            currentLine.text.add(cursorColumn.toInt() - 1, char)
         }
 
         refreshScreenFully()
@@ -81,13 +100,13 @@ class KnitPrintWriter(
      * It DOES NOT update the values of [cursorRow], [cursorColumn], or [currentLine].
      * It simply renders the cursor at the given position.
      */
-    internal fun renderCursor() {
+    private fun renderCursor() {
         // Move the cursor to the absolute position
-        print("\u001b[${cursorRow.value + ROWS};${cursorColumn.value}H")
+        print("\u001b[${cursorRow.toInt() + TOP_ROWS};${cursorColumn.toInt()}H")
         flush()
     }
 
-    private fun isAtEndOfLine(): Boolean = cursorColumn.value - 1 == currentLine.text.size
+    private fun isAtEndOfLine(): Boolean = cursorColumn.toInt() - 1 == currentLine.text.size
 
     /** Re-renders the full screen, including the top bar (i.e., Welcome to ...) and text buffer. **/
     private fun refreshScreenFully() {
@@ -112,17 +131,16 @@ class KnitPrintWriter(
     }
 
     /**
-     * Call this function before process an arrow key.
      * @return false when cursor is going out of frame.
      */
-    internal fun validateCursorPosition(
+    private fun validateCursorPosition(
         rowDelta: Int = 0,
         columnDelta: Int = 0,
     ): Boolean {
-        val destinationRow = cursorRow.value + rowDelta
-        val destinationColumn = cursorColumn.value + columnDelta
+        val destinationRow = cursorRow.toInt() + rowDelta
+        val destinationColumn = cursorColumn.toInt() + columnDelta
 
-        if (destinationRow !in 1..totalLines) return false
+        if (destinationRow !in 1..totalLines + 1) return false
         if (destinationColumn !in 1..currentLine.text.size) return false
         return true
     }

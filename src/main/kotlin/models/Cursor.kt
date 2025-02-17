@@ -1,47 +1,61 @@
 package models
 
-// TODO: Needs refactoring.
-// Make an abstract class or interface that the two classes will inherit.
-// Remove JvmInline from the two classes, so it's value will be mutable.
+abstract class CursorPosition {
+    protected abstract var value: Int
+
+    fun reset() {
+        value = 1
+    }
+
+    fun toInt(): Int = value
+
+    open operator fun inc(): CursorPosition {
+        value += 1
+        return this
+    }
+
+    operator fun dec(): CursorPosition {
+        value -= 1
+        return this
+    }
+
+    operator fun plusAssign(i: Int) {
+        value += i
+    }
+
+    operator fun minusAssign(i: Int) {
+        value -= i
+    }
+
+    operator fun compareTo(other: Int): Int = value.compareTo(other)
+}
 
 /**
  * Cursor's vertical position in the terminal.
- * CursorRow = 0 means the cursor is at the topmost row.
+ * CursorRow = 1 means the cursor is at the topmost row.
  *
- * This inline class prevents confusion with [models.CursorColumn].
+ * The purpose of having this class is to prevent confusion with [models.CursorColumn].
  */
-@JvmInline
-value class CursorRow(
-    val value: Int,
-) {
-    operator fun plus(other: CursorRow): CursorRow = CursorRow(this.value + other.value)
+class CursorRow : CursorPosition() {
+    override var value: Int = 1
 
-    operator fun plus(other: Int): CursorRow = CursorRow(this.value + other)
-
-    operator fun minus(other: CursorRow): CursorRow = CursorRow(this.value - other.value)
-
-    operator fun minus(other: Int): CursorRow = CursorRow(this.value - other)
-
-    operator fun inc(): CursorRow = CursorRow(this.value + 1)
+    override fun inc(): CursorRow {
+        super.inc()
+        return this
+    }
 }
 
 /**
  * Cursor's horizontal position in the terminal.
- * CursorColumn = 0 means the cursor is at the leftmost column.
+ * CursorColumn = 1 means the cursor is at the leftmost column.
  *
- * This inline class prevents confusion with [models.CursorRow].
+ * The purpose of having this class is to prevent confusion with [models.CursorRow].
  */
-@JvmInline
-value class CursorColumn(
-    val value: Int,
-) {
-    operator fun plus(other: CursorColumn): CursorColumn = CursorColumn(this.value + other.value)
+class CursorColumn : CursorPosition() {
+    override var value: Int = 1
 
-    operator fun plus(other: Int): CursorColumn = CursorColumn(this.value + other)
-
-    operator fun minus(other: CursorColumn): CursorColumn = CursorColumn(this.value - other.value)
-
-    operator fun minus(other: Int): CursorColumn = CursorColumn(this.value - other)
-
-    operator fun compareTo(other: Int): Int = value.compareTo(other)
+    override fun inc(): CursorColumn {
+        super.inc()
+        return this
+    }
 }
