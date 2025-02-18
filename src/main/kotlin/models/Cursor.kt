@@ -27,6 +27,10 @@ abstract class CursorPosition {
         value -= i
     }
 
+    operator fun plus(i: Int): Int = value + i
+
+    operator fun minus(i: Int): Int = value - i
+
     operator fun compareTo(other: Int): Int = value.compareTo(other)
 }
 
@@ -36,9 +40,9 @@ abstract class CursorPosition {
  *
  * The purpose of having this class is to prevent confusion with [models.CursorColumn].
  */
-class CursorRow : CursorPosition() {
-    override var value: Int = 1
-
+class CursorRow(
+    override var value: Int,
+) : CursorPosition() {
     override fun inc(): CursorRow {
         super.inc()
         return this
@@ -51,9 +55,9 @@ class CursorRow : CursorPosition() {
  *
  * The purpose of having this class is to prevent confusion with [models.CursorRow].
  */
-class CursorColumn : CursorPosition() {
-    override var value: Int = 1
-
+class CursorColumn(
+    override var value: Int,
+) : CursorPosition() {
     override fun inc(): CursorColumn {
         super.inc()
         return this

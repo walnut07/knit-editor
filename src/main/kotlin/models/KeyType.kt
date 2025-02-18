@@ -1,22 +1,27 @@
+package models
+
 import org.jline.utils.NonBlockingReader
 
 /**
- * Contains key types that knit supports.
+ * Represents a type of user's input key.
  */
 internal sealed class KeyType {
     /**
-     * Represents an arrow key such as ↑, →, ↓, ←.
+     * An arrow key. i.e., ↑, →, ↓, ←.
      */
     class Arrow(
         val direction: ArrowDirection,
     ) : KeyType()
 
+    /**
+     * A control character. i.e., \n.
+     */
     class ControlCharacter(
         val controlCharacterKind: ControlCharacterKind,
     ) : KeyType()
 
     /**
-     * A character that user intended to write.
+     * A character that user intends to write.
      */
     class Text(
         val value: Char,
@@ -28,8 +33,7 @@ internal sealed class KeyType {
         fun parse(
             reader: NonBlockingReader,
             key: Int,
-        ): KeyType {
-            val a
+        ): KeyType =
             when (key) {
                 27 -> { // Arrow key
                     val next = reader.read()
@@ -50,12 +54,10 @@ internal sealed class KeyType {
                 // Normal key
                 else -> Text(key.toChar())
             }
-            return a
-        }
     }
 }
 
-enum class ArrowDirection(
+internal enum class ArrowDirection(
     val deltaCol: Int,
     val deltaRow: Int,
 ) {
@@ -65,7 +67,7 @@ enum class ArrowDirection(
     RIGHT(deltaCol = 1, deltaRow = 0),
 }
 
-enum class ControlCharacterKind {
+internal enum class ControlCharacterKind {
     LineFeed, // \n
     CarriageReturn, // \r
     Backspace, // \b
