@@ -31,11 +31,12 @@ object LineManager {
     /**
      * Adds a new line at the end of the linked list.
      *
-     * @param line a line to add.
+     * @param text text of the line to add.
      */
-    fun addLine(line: Line) {
-        currentLine.next = line
-        currentLine = line
+    fun addLine(text: ArrayList<Char>) {
+        val lineToAdd = Line(text, prev = currentLine, next = null)
+        currentLine.next = lineToAdd
+        currentLine = lineToAdd
         totalLines++
     }
 
@@ -45,5 +46,17 @@ object LineManager {
     fun removeChar(index: Int) {
         currentLine.text.removeAt(index - 2)
         CursorManager.column -= 1
+    }
+
+    fun goToNextLine() {
+        if (currentLine.next != null) {
+            currentLine = currentLine.next!!
+        }
+    }
+
+    fun goToPreviousLine() {
+        if (currentLine.prev != null) {
+            currentLine = currentLine.prev!!
+        }
     }
 }

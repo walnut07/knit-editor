@@ -4,7 +4,7 @@ import managers.CursorManager
 import managers.LineManager
 import managers.RendererManager
 import models.ControlCharacterKind
-import models.Line
+import models.CursorColumn
 
 /**
  * Contains logic to process command keys.
@@ -17,12 +17,7 @@ class CommandController {
      */
     internal fun command(input: ControlCharacterKind) {
         when (input) {
-            ControlCharacterKind.LineFeed, ControlCharacterKind.CarriageReturn -> {
-                LineManager.addLine(Line(arrayListOf(), prev = LineManager.currentLine, next = null))
-                CursorManager.row += 1
-                CursorManager.column.reset()
-                RendererManager.refreshScreenFully()
-            }
+            ControlCharacterKind.LineFeed, ControlCharacterKind.CarriageReturn -> lineBreak()
             ControlCharacterKind.Backspace, ControlCharacterKind.Delete -> {
                 // Delete the current character.
                 if (CursorManager.column - 1 >= 1) {
@@ -34,5 +29,24 @@ class CommandController {
 
             ControlCharacterKind.Quit -> TODO()
         }
+    }
+
+    /**
+     * Creates a line break.
+     */
+    private fun lineBreak() {
+        val currentLineLength = LineManager.currentLine.text.size
+
+        val textToCarry = arrayListOf<Char>()
+        LineManager.currentLine.text
+            .subList(CursorManager.column.toInt() - 1, currentLineLength)
+            .onEach { char -> textToCarry.add(char) }
+            .clear() // Remove text to carry from the current line.
+
+        LineManager.addLine(textToCarry)
+        CursorManager.row += 1
+        CursorManager.column = CursorColumn(textToCarry.size + 1)
+
+        RendererManager.refreshScreenFully()
     }
 }

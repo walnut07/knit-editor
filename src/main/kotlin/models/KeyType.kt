@@ -57,6 +57,12 @@ internal sealed class KeyType {
     }
 }
 
+/**
+ * The four directions cursor can move to.
+ *
+ * @param deltaCol ←→ the horizontal steps from the current position.
+ * @param deltaRow ↑↓ the vertical steps from the current position.
+ */
 internal enum class ArrowDirection(
     val deltaCol: Int,
     val deltaRow: Int,

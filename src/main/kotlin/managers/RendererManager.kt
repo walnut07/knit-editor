@@ -37,7 +37,6 @@ object RendererManager {
      */
     internal fun renderCursor() {
         with(writer) {
-            print("Rendering cursor!!")
             // Move the cursor to the absolute position
             print("\u001b[${CursorManager.row.toInt() + TOP_ROWS};${CursorManager.column.toInt()}H")
             flush()
