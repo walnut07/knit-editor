@@ -1,6 +1,7 @@
 import controller.ArrowController
 import controller.CommandController
 import controller.TextController
+import managers.LineManager
 import managers.RendererManager
 import models.KeyType
 import org.jline.terminal.TerminalBuilder
@@ -16,7 +17,7 @@ class EditorApp {
 
     private val reader: NonBlockingReader = Terminal.reader
 
-    // TODO: Consider using Koin for efficient dependency injection.
+    // Initialize controllers for business logic.
     private val arrowController = ArrowController()
     private val commandController = CommandController()
     private val textController = TextController()
@@ -30,7 +31,7 @@ class EditorApp {
         // Start reading user's input.
         while (true) {
             val key = reader.read()
-            if (key == 'q'.code) break // Temporarily set
+            if (key == 'q'.code) break // Temporarily set quit key
 
             val keyType: KeyType = KeyType.Utils.parse(reader, key)
 
@@ -48,7 +49,7 @@ class EditorApp {
                 }
             }
         }
-
+        println("The final document: ${LineManager.lineHead}")
         Terminal.terminal.close()
     }
 }

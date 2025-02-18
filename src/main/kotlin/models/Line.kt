@@ -7,9 +7,9 @@ package models
  * (Head [Line]) ⇄ (1st line [Line]) ⇄ (2nd line [Line])
  */
 class Line(
-    var text: ArrayList<Char>,
-    var prev: Line?,
-    var next: Line?,
+    var text: ArrayList<Char> = arrayListOf(),
+    var prev: Line? = null,
+    var next: Line? = null,
 ) {
     override fun toString(): String = "Line(text=\"${text.joinToString("")}\", next=${next?.toString() ?: "null"})"
 }
