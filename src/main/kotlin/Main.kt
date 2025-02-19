@@ -4,7 +4,7 @@ fun main() {
     val editor = EditorApp()
     editor.run()
 
-    // disableRawMode()
+    disableRawMode()
 }
 
 /**
@@ -16,5 +16,13 @@ private fun enableRawMode() {
             .inheritIO()
             .start()
 
+    process.waitFor()
+}
+
+/**
+ * Disables raw mode by running a C program
+ */
+private fun disableRawMode() {
+    val process = ProcessBuilder("./disable_raw_mode").start()
     process.waitFor()
 }
