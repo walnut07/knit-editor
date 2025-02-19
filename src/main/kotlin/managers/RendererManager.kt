@@ -23,7 +23,7 @@ object RendererManager {
         with(writer) {
             print("\u001b[2J") // Clear screen
             print("\u001b[0;0H") // Move cursor to top left
-            print("Welcome to Kurumi's editor!\r\n")
+            print("Welcome to Knit.\r\n")
             print("----------------------\r\n")
             flush()
         }
@@ -51,7 +51,7 @@ object RendererManager {
             // Render the top bar
             print("\u001b[2J") // Clear screen
             print("\u001b[0;0H") // Move cursor to top left
-            print("Welcome to Kurumi's editor!\r\n")
+            print("Welcome to Knit.\r\n")
             print("----------------------\r\n")
 
             // Render the entire tree.
