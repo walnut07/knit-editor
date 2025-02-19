@@ -50,7 +50,9 @@ internal sealed class KeyType {
                     }
                 }
                 // Control character
-                '\n'.code, '\r'.code, '\b'.code, 127 -> getControlCharacterKind(key)?.let { ControlCharacter(it) } ?: Unknown
+                '\n'.code, '\r'.code, '\b'.code, 127, 24 -> {
+                    getControlCharacterKind(key)?.let { ControlCharacter(it) } ?: Unknown
+                }
                 // Normal key
                 else -> Text(key.toChar())
             }
@@ -78,6 +80,7 @@ internal enum class ControlCharacterKind {
     CarriageReturn, // \r
     Backspace, // \b
     Delete, // ASCII 127
+    Save, // ASCII 24
     Quit, // q
 }
 
@@ -87,6 +90,7 @@ private fun getControlCharacterKind(input: Int): ControlCharacterKind? =
         '\r'.code -> ControlCharacterKind.CarriageReturn
         '\b'.code -> ControlCharacterKind.Backspace
         127 -> ControlCharacterKind.Delete
+        24 -> ControlCharacterKind.Save
         'C'.code -> ControlCharacterKind.Quit
         else -> null
     }

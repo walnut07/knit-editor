@@ -5,6 +5,7 @@ import managers.LineManager
 import managers.RendererManager
 import models.ControlCharacterKind
 import models.CursorColumn
+import java.io.File
 
 /**
  * Contains logic to process command keys.
@@ -19,6 +20,7 @@ class CommandController {
         when (input) {
             ControlCharacterKind.LineFeed, ControlCharacterKind.CarriageReturn -> lineBreak()
             ControlCharacterKind.Backspace, ControlCharacterKind.Delete -> delete()
+            ControlCharacterKind.Save -> save()
             ControlCharacterKind.Quit -> TODO()
         }
     }
@@ -73,6 +75,23 @@ class CommandController {
             CursorManager.column -= 1
         }
 
+        RendererManager.refreshScreenFully()
+    }
+
+    /**
+     * Saves the current text buffer to a file.
+     *
+     * TODO: Implement a feature to name a file. Currently, the file "buffer.txt" will be created in the current directory.
+     */
+    private fun save() {
+        val sb = StringBuilder()
+        var line = LineManager.lineHead
+        while (true) {
+            sb.append(line.text.joinToString(""))
+            sb.append(System.lineSeparator())
+            line = line.next ?: break
+        }
+        File("buffer.txt").writeText(sb.toString())
         RendererManager.refreshScreenFully()
     }
 }
