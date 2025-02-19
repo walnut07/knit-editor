@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.mtkrm"
-version = "1.0"
+version = "0.1"
 
 application {
     mainClass.set("MainKt")
