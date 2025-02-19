@@ -17,13 +17,11 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test"))
+    // https://mvnrepository.com/artifact/io.mockk/mockk
+    testImplementation("io.mockk:mockk:1.13.16")
+
     implementation(kotlin("stdlib"))
-    // https://mvnrepository.com/artifact/net.java.dev.jna/jna
-    implementation("net.java.dev.jna:jna:5.16.0")
     implementation("org.jline:jline:3.21.0")
-    implementation("net.java.dev.jna:jna:5.13.0")
-    // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-test
-    implementation("org.jetbrains.kotlin:kotlin-test:2.1.10")
 }
 
 tasks.test {
