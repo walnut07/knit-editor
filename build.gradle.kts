@@ -21,7 +21,7 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.16")
 
     implementation(kotlin("stdlib"))
-    implementation("org.jline:jline:3.21.0")
+    implementation("org.jline:jline:3.25.0")
 }
 
 tasks.test {
