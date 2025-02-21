@@ -36,8 +36,45 @@ tasks.withType<JavaExec> {
     standardInput = System.`in`
 }
 
-// TODO: Create a task to compile the C program "raw_mode.c".
-
 kotlin {
     jvmToolchain(17)
+}
+
+/**
+ * Builds the C programs (`raw_mode.c` and `disable_raw_mode.c`).
+ */
+tasks.register<Exec>("compileCPrograms") {
+    val scriptDir = file("./script")
+    val binDir = file("./script/bin").apply { mkdirs() }
+
+    val cFiles = listOf("raw_mode.c", "disable_raw_mode.c").map { scriptDir.resolve(it) }
+    val binaries = cFiles.map { binDir.resolve(it.nameWithoutExtension) }
+
+    println("------ Compiling C scripts ------")
+
+    val osName = System.getProperty("os.name").lowercase()
+
+    val compileCommand =
+        if (osName.contains("win")) {
+            // Windows: Use MSVC `cl`
+            listOf("cmd", "/c", "cl") + cFiles.map { it.absolutePath } + "/Fe:${binDir.absolutePath}/"
+        } else {
+            // macOS / Linux: Use `gcc`
+            listOf(
+                "sh",
+                "-c",
+                cFiles.joinToString(" && ") { "gcc -o ${binDir.resolve(it.nameWithoutExtension).absolutePath} ${it.absolutePath}" },
+            )
+        }
+
+    commandLine(compileCommand)
+
+    outputs.files(binaries)
+}
+
+/**
+ * Bundles all the dependencies into a jar file.
+ */
+tasks.named("shadowJar") {
+    dependsOn("compileCPrograms")
 }

@@ -28,16 +28,6 @@ void enableRawMode() {
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);  // Apply the new settings
 }
 
-void disableRawMode() {
-    struct termios original;
-    tcgetattr(STDIN_FILENO, &original);  // Get current terminal attributes
-    original.c_lflag |= (ECHO | ICANON | ISIG | IEXTEN);  // Re-enable normal mode
-    original.c_iflag |= (BRKINT | ICRNL | INPCK | ISTRIP | IXON);
-    original.c_oflag |= (OPOST);
-    original.c_cflag &= ~(CS8);
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &original);  // Restore settings
-}
-
 int main() {
     enableRawMode();
     return 0;

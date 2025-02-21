@@ -45,3 +45,6 @@ bin/
 .DS_Store
 
 /llm/
+
+### Binary Files ###
+/script/bin/
