@@ -88,4 +88,10 @@ object LineManager {
             currentLine = currentLine.prev!!
         }
     }
+
+    internal fun reset() {
+        lineHead = Line(arrayListOf(), prev = null, next = null)
+        currentLine = lineHead
+        totalLines = 1
+    }
 }

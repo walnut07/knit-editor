@@ -15,4 +15,6 @@ object CursorManager {
      * @return true if cursor is at the end of the line.
      */
     internal fun isCursorAtEndOfLine(): Boolean = column - 1 == LineManager.currentLine.text.size
+
+    override fun toString(): String = "CursorManager(row=${row.toInt()}, column=${column.toInt()})"
 }
