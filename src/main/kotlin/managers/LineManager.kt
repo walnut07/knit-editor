@@ -64,8 +64,8 @@ object LineManager {
             currentLine.next?.prev = currentLine.prev
             currentLine = temp ?: Line()
         }
+
         currentLine.text.addAll(textToCarry)
-        require(currentLine.text.size >= 1)
         totalLines--
     }
 

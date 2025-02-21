@@ -257,4 +257,48 @@ class CommandControllerTest {
         assertEquals(1, cursorRow.toInt(), "Row should decrease")
         assertEquals(6, cursorColumn.toInt(), "Column should be previous line length plus one")
     }
+
+    @Test
+    fun `delete twice removes consecutive empty lines and moves cursor to previous line`() {
+        // Step 1: Setup the document:
+        //   - First line: "Hello"
+        //   - Second line: (empty)
+        //   - Third line: (empty)
+        val firstLine = Line("Hello".toCharArray().toCollection(ArrayList()), prev = null, next = null)
+        val secondLine = Line(arrayListOf(), prev = firstLine, next = null) // First empty line
+        val thirdLine = Line(arrayListOf(), prev = secondLine, next = null) // Second empty line
+
+        firstLine.next = secondLine
+        secondLine.next = thirdLine
+        linesList.clear()
+        linesList.addAll(listOf(firstLine, secondLine, thirdLine))
+        currentLine = thirdLine
+
+        // Set cursor at the start of the second empty line
+        testRow = CursorRow(3)
+        testColumn = CursorColumn(1)
+        cursorRow = testRow
+        cursorColumn = testColumn
+        every { CursorManager.row } answers { cursorRow }
+        every { CursorManager.column } answers { cursorColumn }
+
+        // Stub `removeLine()` to correctly delete the empty lines
+        every { LineManager.removeLine(any()) } answers {
+            val lineToRemove = currentLine
+            val prevLine = lineToRemove.prev
+            prevLine?.next = null
+            linesList.remove(lineToRemove)
+            currentLine = prevLine ?: firstLine
+        }
+
+        // Step 2: Press Delete Twice
+        commandController.command(ControlCharacterKind.Delete) // Deletes third line
+        commandController.command(ControlCharacterKind.Delete) // Deletes second line
+
+        // Verify: Both empty lines should be removed
+        assertEquals(1, linesList.size, "Only 'Hello' should remain")
+        assertEquals("Hello", linesList[0].text.joinToString(""), "First line should still be 'Hello'")
+        assertEquals(1, cursorRow.toInt(), "Cursor should move back to row 1")
+        assertEquals(6, cursorColumn.toInt(), "Cursor should be at the end of 'Hello'")
+    }
 }
